@@ -1,22 +1,18 @@
 $(function () {
-    console.log("starting loading home games from IFV");
-
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
-    const url = "https://www.el-pl.ch/de/erste-liga/organisation-el/vereine-erste-liga/verein-1l.aspx/v-331/a-hs/"; // site that doesn’t send Access-Control-*
+    const homeGameUrl = "https://www.el-pl.ch/de/erste-liga/organisation-el/vereine-erste-liga/verein-1l.aspx/v-331/a-hs/";
 
     const loadingText = "Daten werden geladen...";
 
     //setting up loading message
     $("#upcoming-games").append(loadingText);
 
-    fetch(proxyurl + url)
+    fetch(proxyurl + homeGameUrl)
         .then(response => response.text())
         .then(function (data) {
             addContents($(data).find("#ctl01_ctl10_VereinMasterObject_ctl01_tbResultate")[0]);
         })
-        .catch(() => console.log("Can’t access " + url + " response. It was blocked or an error occured"));
-
-
+        .catch(() => console.log("Can’t access " + homeGameUrl + " response. It was blocked or an error occured"));
 });
 
 function addContents(contents) {

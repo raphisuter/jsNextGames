@@ -1,16 +1,16 @@
-$(function () {
+jQuery( document ).ready(function() {
     const proxyurl = "https://cors-anywhere.herokuapp.com/";
     const homeGameUrl = "https://www.el-pl.ch/de/erste-liga/organisation-el/vereine-erste-liga/verein-1l.aspx/v-331/a-hs/";
 
     const loadingText = "Daten werden geladen...";
 
     //setting up loading message
-    $("#upcoming-games").append(loadingText);
+    jQuery("#upcoming-games").append(loadingText);
 
     fetch(proxyurl + homeGameUrl)
         .then(response => response.text())
         .then(function (data) {
-            addContents($(data).find("#ctl01_ctl10_VereinMasterObject_ctl01_tbResultate")[0]);
+            addContents(jQuery(data).find("#ctl01_ctl10_VereinMasterObject_ctl01_tbResultate")[0]);
         })
         .catch(() => console.log("Can’t access " + homeGameUrl + " response. It was blocked or an error occured"));
 });
@@ -20,28 +20,28 @@ function addContents(contents) {
     var dateLastDayOfGameWeek = recursiveGamedayFinder(contents, 7); //starting with day 7 (sunday)
 
     //remove loading text
-    $("#upcoming-games")[0].innerText = '';
+    jQuery("#upcoming-games")[0].innerText = '';
 
-    $(contents).children().each(function (index) {
+    jQuery(contents).children().each(function (index) {
         //Game Date
-        if ($(this).hasClass('sppTitel')) {
+        if (jQuery(this).hasClass('sppTitel')) {
             if (finalDayOfGameweek) { //break if final Day of Gameweek is reached
                 return false;
             }
 
-            if ($(this).html().trim() === dateLastDayOfGameWeek) { //set day as final day if dates match
+            if (jQuery(this).html().trim() === dateLastDayOfGameWeek) { //set day as final day if dates match
                 finalDayOfGameweek = true;
                 console.log("Last Day of gameweek: " + dateLastDayOfGameWeek);
             }
 
-            $("#upcoming-games").append($(this));
+            jQuery("#upcoming-games").append(jQuery(this));
         }
         //Game itself
         else {
-            if ($(this).find('.spiel').children().first().html().trim() !== "") {
-                formatGameInfo($(this).find('.spiel').children().eq(2)[0]);
+            if (jQuery(this).find('.spiel').children().first().html().trim() !== "") {
+                formatGameInfo(jQuery(this).find('.spiel').children().eq(2)[0]);
 
-                $("#upcoming-games").append($(this));
+                jQuery("#upcoming-games").append(jQuery(this));
             }
         }
     })
@@ -51,8 +51,8 @@ function formatGameInfo(gameInfo) {
     const mainPitch = "Sportanlage \"Tierpark\" Goldau - Hauptspielfeld (1) Tierpark, Goldau";
     const synteticPitch = "Sportanlage \"Tierpark\" Goldau - Kunststoffrasen (PHZ), Goldau";
     const sidePitch = "Sportanlage \"Tierpark\" Goldau - Nebenplatz (2), Goldau";
-    const leagueGame = "Meisterschaft";
-    const cup = "Cup";
+    const leagueGame = "MS:";
+    const cup = "Cup:";
 
     var pitch;
     if (gameInfo.innerText.indexOf(mainPitch) >= 0) {
@@ -68,7 +68,7 @@ function formatGameInfo(gameInfo) {
     }
 
     var type = 1; // 0 = Meisterschaft, 1 = Cup
-    if (gameInfo.innerText.indexOf(leagueGame) >= 0) {
+    if (gameInfo.innerText.indexOf('Meisterschaft') >= 0) {
         type = 0;
     }
 
@@ -80,9 +80,10 @@ function formatGameInfo(gameInfo) {
     gameInfo.innerText = gameInfo.innerText + ' ' + pitch;
 
     //check if game type is set in the gameInfo string, else set to start of gameInfo string
-    if (gameInfo.innerText.indexOf(type == 1 ? cup : leagueGame) < 0) {
+    if (gameInfo.innerText.indexOf(type == 1 ? 'Cup' : 'Meisterschaft') < 0) {
         gameInfo.innerText = (type == 1 ? cup : leagueGame) + ' ' + gameInfo.innerText;
     }
+    gameInfo.innerText = gameInfo.innerText.replace('Meisterschaft', leagueGame);
 }
 
 /**
